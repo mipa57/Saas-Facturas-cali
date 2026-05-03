@@ -1,0 +1,56 @@
+# Variables de entorno - NUNCA subir
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+.env/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs
+*.log
+logs/
+
+# Base de datos local
+*.db
+*.sqlite
+
+# Archivos temporales
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de prueba con facturas reales
+tests/facturas_reales/
+*.pdf.test
+
+# Claves y certificados
+*.pem
+*.key
+*.cert
