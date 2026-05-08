@@ -115,9 +115,11 @@ async def subir_factura(
                 resultado_procesamiento["contenido"]
             )
         else:
-            # Para imágenes usar el texto que Claude extrae
-            datos_factura = extraer_datos_factura(
-                f"Imagen de factura: {archivo.filename}"
+            # Imágenes: enviar base64 real a Claude
+            from app.services.claude_client import extraer_datos_factura_imagen
+            datos_factura = extraer_datos_factura_imagen(
+                resultado_procesamiento["base64"],
+                resultado_procesamiento["media_type"]
             )
         
         # Validar NIT extraído
@@ -165,12 +167,14 @@ async def listar_facturas(limite: int = 10):
     """Lista las últimas facturas procesadas"""
     try:
         coleccion = coleccion_facturas()
-        facturas = list(
-            coleccion.find(
-                {},
-                {"_id": 0}  # Excluir el _id de MongoDB
-            ).limit(limite).sort("fecha_procesado", -1)
+        facturas_raw = list(
+            coleccion.find({}).limit(limite).sort("fecha_procesado", -1)
         )
+        # Convertir ObjectId a string para poder serializar a JSON
+        facturas = []
+        for f in facturas_raw:
+            f["_id"] = str(f["_id"])
+            facturas.append(f)
         
         return {
             "total": len(facturas),
