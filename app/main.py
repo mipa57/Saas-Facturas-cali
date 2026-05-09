@@ -116,11 +116,10 @@ async def subir_factura(
             )
         else:
             # Imágenes: enviar base64 real a Claude
-            from app.services.claude_client import extraer_datos_factura_imagen
             datos_factura = extraer_datos_factura(
-                imagen_base64=resultado_procesamiento["base64"],
-                media_type=resultado_procesamiento["media_type"]
-            )
+            imagen_base64=resultado_procesamiento["base64"],
+            media_type=resultado_procesamiento["media_type"]
+        )
         
         # Validar NIT extraído
         if "nit" in datos_factura:
