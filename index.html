@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS Facturas Cali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #00e676;
+    --verde-oscuro: #00c853;
+    --fondo: #0a0f0a;
+    --superficie: #111811;
+    --borde: #1e2e1e;
+    --texto: #e8f5e9;
+    --texto-dim: #66bb6a;
+    --rojo: #ff5252;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: var(--mono);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--borde) 1px, transparent 1px),
+      linear-gradient(90deg, var(--borde) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .contenedor {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 56px;
+    border-bottom: 1px solid var(--borde);
+    padding-bottom: 24px;
+  }
+
+  .logo {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -1px;
+    color: var(--verde);
+  }
+
+  .version {
+    font-size: 11px;
+    color: var(--texto-dim);
+    background: var(--borde);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .estado-api {
+    margin-left: auto;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--texto-dim);
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--texto-dim);
+    animation: pulso 2s ease-in-out infinite;
+  }
+  .dot.activo { background: var(--verde); }
+  .dot.error  { background: var(--rojo); animation: none; }
+
+  @keyframes pulso {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  .seccion { margin-bottom: 48px; }
+
+  .etiqueta {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--texto-dim);
+    margin-bottom: 16px;
+  }
+
+  /* Zona de carga */
+  .zona-carga {
+    border: 1px dashed var(--borde);
+    border-radius: 4px;
+    padding: 48px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--superficie);
+    position: relative;
+  }
+
+  .zona-carga input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .zona-carga:hover, .zona-carga.arrastrar {
+    border-color: var(--verde);
+    background: rgba(0,230,118,0.04);
+  }
+
+  .icono-carga { font-size: 32px; margin-bottom: 12px; display: block; }
+
+  .texto-carga {
+    font-size: 13px;
+    color: var(--texto-dim);
+    line-height: 1.8;
+  }
+
+  .texto-carga strong { color: var(--verde); }
+
+  /* Campo NIT + botón */
+  .fila-accion {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .fila-accion input {
+    flex: 1;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    color: var(--texto);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .fila-accion input::placeholder { color: #2d4a2d; }
+  .fila-accion input:focus { border-color: var(--verde); }
+
+  .btn-procesar {
+    background: var(--verde);
+    color: #000;
+    border: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 10px 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-procesar:hover    { background: var(--verde-oscuro); }
+  .btn-procesar:disabled { background: var(--borde); color: #2d4a2d; cursor: not-allowed; }
+
+  /* Archivo seleccionado */
+  .archivo-chip {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(0,230,118,0.06);
+    border: 1px solid rgba(0,230,118,0.2);
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--verde);
+  }
+  .archivo-chip.visible { display: flex; }
+
+  /* Barra de progreso */
+  .barra {
+    display: none;
+    height: 2px;
+    background: var(--borde);
+    border-radius: 1px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .barra.visible { display: block; }
+  .barra-inner {
+    height: 100%;
+    background: var(--verde);
+    animation: cargando 1.4s ease-in-out infinite;
+  }
+  @keyframes cargando {
+    0%   { width: 0%;  margin-left: 0%; }
+    50%  { width: 60%; margin-left: 20%; }
+    100% { width: 0%;  margin-left: 100%; }
+  }
+
+  /* Resultado */
+  .resultado {
+    display: none;
+    margin-top: 24px;
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .resultado.visible { display: block; }
+
+  .resultado-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--superficie);
+    border-bottom: 1px solid var(--borde);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--texto-dim);
+  }
+
+  .badge {
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .badge.ok  { background: rgba(0,230,118,0.15); color: var(--verde); }
+  .badge.err { background: rgba(255,82,82,0.15); color: var(--rojo); }
+
+  .resultado-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .dato { display: flex; flex-direction: column; gap: 4px; }
+
+  .dato label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #2d6a2d;
+  }
+
+  .dato .val {
+    font-size: 14px;
+    color: var(--texto);
+    font-weight: 600;
+  }
+
+  .dato .val.total {
+    font-family: var(--sans);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--verde);
+  }
+
+  .dato .val.ok  { color: var(--verde); }
+  .dato .val.mal { color: var(--rojo); }
+  .dato.full { grid-column: 1 / -1; }
+
+  /* Error */
+  .error-msg {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(255,82,82,0.08);
+    border: 1px solid rgba(255,82,82,0.25);
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--rojo);
+    line-height: 1.6;
+  }
+  .error-msg.visible { display: block; }
+
+  /* Lista facturas */
+  .cabecera-lista {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .btn-recargar {
+    background: none;
+    border: 1px solid var(--borde);
+    color: var(--texto-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-recargar:hover { border-color: var(--verde); color: var(--verde); }
+
+  .lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--borde);
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .fila {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--superficie);
+    font-size: 12px;
+    transition: background 0.1s;
+  }
+  .fila:hover { background: rgba(0,230,118,0.03); }
+
+  .fila.cabecera {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #2d6a2d;
+    background: var(--fondo);
+    pointer-events: none;
+  }
+
+  .fila .proveedor { font-weight: 600; }
+  .fila .nit       { color: var(--texto-dim); font-size: 11px; }
+  .fila .monto     { color: var(--verde); font-weight: 600; text-align: right; }
+  .fila .fecha     { color: #2d6a2d; font-size: 11px; }
+
+  .vacio {
+    padding: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: #2d4a2d;
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--borde);
+    font-size: 10px;
+    color: #2d4a2d;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 600px) {
+    .resultado-body { grid-template-columns: 1fr; }
+    .fila { grid-template-columns: 1fr 1fr; }
+    .fila .fecha, .fila .nit { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <header>
+    <div class="logo">Facturas Cali</div>
+    <span class="version">v1.0.0</span>
+    <div class="estado-api">
+      <span class="dot" id="dot-api"></span>
+      <span id="txt-estado">Conectando...</span>
+    </div>
+  </header>
+
+  <!-- SUBIR FACTURA -->
+  <div class="seccion">
+    <div class="etiqueta">// Subir factura</div>
+
+    <div class="zona-carga" id="zona">
+      <input type="file" id="input-archivo" accept=".pdf,.jpg,.jpeg,.png,.webp">
+      <span class="icono-carga">📄</span>
+      <div class="texto-carga">
+        <strong>Arrastra tu factura aquí</strong><br>
+        o haz clic para seleccionar<br>
+        PDF · JPG · PNG · WebP
+      </div>
+    </div>
+
+    <div class="archivo-chip" id="chip-archivo">
+      <span>📎</span>
+      <span id="txt-archivo"></span>
+    </div>
+
+    <div class="fila-accion">
+      <input
+        type="text"
+        id="input-nit"
+        placeholder="NIT cliente (opcional) — ej: 900123456-1"
+        maxlength="12"
+      >
+      <button class="btn-procesar" id="btn-procesar" disabled>Procesar</button>
+    </div>
+
+    <div class="barra" id="barra"><div class="barra-inner"></div></div>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <div class="resultado" id="resultado">
+      <div class="resultado-header">
+        <span>Datos extraídos</span>
+        <span class="badge ok" id="badge">PROCESADO</span>
+      </div>
+      <div class="resultado-body" id="resultado-body"></div>
+    </div>
+  </div>
+
+  <!-- LISTA DE FACTURAS -->
+  <div class="seccion">
+    <div class="cabecera-lista">
+      <div class="etiqueta">// Facturas procesadas</div>
+      <button class="btn-recargar" id="btn-recargar">↻ Recargar</button>
+    </div>
+    <div id="contenedor-lista"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <footer>
+    <span>SaaS Facturas Cali — PyMEs Colombia</span>
+    <span id="txt-hora"></span>
+  </footer>
+
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+let archivoActual = null;
+
+// ─── Estado API ──────────────────────────────
+async function verificarApi() {
+  try {
+    const r = await fetch(`${API}/`);
+    if (r.ok) {
+      document.getElementById('dot-api').className = 'dot activo';
+      document.getElementById('txt-estado').textContent = 'API activa';
+    }
+  } catch {
+    document.getElementById('dot-api').className = 'dot error';
+    document.getElementById('txt-estado').textContent = 'API no disponible';
+  }
+}
+
+// ─── Zona de carga ───────────────────────────
+const zona = document.getElementById('zona');
+const inputArchivo = document.getElementById('input-archivo');
+
+zona.addEventListener('dragover',  e => { e.preventDefault(); zona.classList.add('arrastrar'); });
+zona.addEventListener('dragleave', () => zona.classList.remove('arrastrar'));
+zona.addEventListener('drop', e => {
+  e.preventDefault();
+  zona.classList.remove('arrastrar');
+  if (e.dataTransfer.files[0]) seleccionar(e.dataTransfer.files[0]);
+});
+inputArchivo.addEventListener('change', e => {
+  if (e.target.files[0]) seleccionar(e.target.files[0]);
+});
+
+function seleccionar(archivo) {
+  archivoActual = archivo;
+  document.getElementById('txt-archivo').textContent = archivo.name;
+  document.getElementById('chip-archivo').classList.add('visible');
+  document.getElementById('btn-procesar').disabled = false;
+  limpiarUI();
+}
+
+// ─── Procesar ────────────────────────────────
+document.getElementById('btn-procesar').addEventListener('click', async () => {
+  if (!archivoActual) return;
+  const btn = document.getElementById('btn-procesar');
+  const nit = document.getElementById('input-nit').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = 'Procesando...';
+  document.getElementById('barra').classList.add('visible');
+  limpiarUI();
+
+  const form = new FormData();
+  form.append('archivo', archivoActual);
+  if (nit) form.append('nit_cliente', nit);
+
+  try {
+    const res = await fetch(`${API}/facturas/subir`, { method: 'POST', body: form });
+    const datos = await res.json();
+
+    if (!res.ok) throw new Error(datos.detail || 'Error procesando la factura');
+
+    mostrarResultado(datos);
+    cargarFacturas();
+
+  } catch (err) {
+    const el = document.getElementById('error-msg');
+    el.textContent = `❌ ${err.message}`;
+    el.classList.add('visible');
+  } finally {
+    document.getElementById('barra').classList.remove('visible');
+    btn.disabled = false;
+    btn.textContent = 'Procesar';
+  }
+});
+
+function limpiarUI() {
+  document.getElementById('error-msg').classList.remove('visible');
+  document.getElementById('resultado').classList.remove('visible');
+}
+
+function mostrarResultado(r) {
+  const d = r.datos;
+  const total = d.total ? `$${Number(d.total).toLocaleString('es-CO')}` : '—';
+  const nitClase = d.nit_valido ? 'ok' : 'mal';
+  const nitIcono = d.nit_valido ? '✅' : '⚠️';
+
+  document.getElementById('resultado-body').innerHTML = `
+    <div class="dato">
+      <label>Proveedor</label>
+      <div class="val">${d.proveedor || '—'}</div>
+    </div>
+    <div class="dato">
+      <label>NIT</label>
+      <div class="val ${nitClase}">${nitIcono} ${d.nit || '—'}</div>
+    </div>
+    <div class="dato">
+      <label>Total COP</label>
+      <div class="val total">${total}</div>
+    </div>
+    <div class="dato">
+      <label>Fecha</label>
+      <div class="val">${d.fecha || '—'}</div>
+    </div>
+    <div class="dato full">
+      <label>ID guardado</label>
+      <div class="val" style="font-size:11px;color:var(--texto-dim)">${r.id}</div>
+    </div>
+  `;
+  document.getElementById('resultado').classList.add('visible');
+}
+
+// ─── Lista facturas ───────────────────────────
+async function cargarFacturas() {
+  const c = document.getElementById('contenedor-lista');
+  try {
+    const res = await fetch(`${API}/facturas?limite=20`);
+    const datos = await res.json();
+
+    if (!datos.facturas?.length) {
+      c.innerHTML = '<div class="vacio">Aún no hay facturas procesadas</div>';
+      return;
+    }
+
+    const filas = datos.facturas.map(f => {
+      const total = f.total ? `$${Number(f.total).toLocaleString('es-CO')}` : '—';
+      const fecha = f.fecha_procesado
+        ? new Date(f.fecha_procesado).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })
+        : '—';
+      return `
+        <div class="fila">
+          <div class="proveedor">${f.proveedor || f.archivo_original || '—'}</div>
+          <div class="nit">${f.nit || '—'}</div>
+          <div class="fecha">${fecha}</div>
+          <div class="monto">${total}</div>
+        </div>`;
+    }).join('');
+
+    c.innerHTML = `
+      <div class="lista">
+        <div class="fila cabecera">
+          <div>Proveedor</div><div>NIT</div><div>Fecha</div>
+          <div style="text-align:right">Total</div>
+        </div>
+        ${filas}
+      </div>`;
+  } catch {
+    c.innerHTML = '<div class="vacio">Error cargando — ¿está corriendo el servidor?</div>';
+  }
+}
+
+document.getElementById('btn-recargar').addEventListener('click', cargarFacturas);
+
+// ─── Init ─────────────────────────────────────
+verificarApi();
+cargarFacturas();
+document.getElementById('txt-hora').textContent =
+  new Date().toLocaleString('es-CO', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
+</script>
+</body>
+</html>
