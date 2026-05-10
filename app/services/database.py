@@ -26,8 +26,6 @@ def conectar_mongodb():
         # Conexión con SSL para Windows 10
         cliente_mongo = MongoClient(
             MONGODB_URI,
-            tls=True,
-            tlsAllowInvalidCertificates=True,
             serverSelectionTimeoutMS=10000
         )
         base_datos = cliente_mongo[MONGODB_DATABASE]
