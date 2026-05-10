@@ -119,7 +119,7 @@ async def subir_factura(
             datos_factura = extraer_datos_factura(
             imagen_base64=resultado_procesamiento["base64"],
             media_type=resultado_procesamiento["media_type"]
-        )
+    )
         
         # Validar NIT extraído
         if "nit" in datos_factura:

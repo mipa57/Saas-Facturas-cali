@@ -13,6 +13,9 @@ load_dotenv()
 cliente = Anthropic()
 MODELO = "claude-haiku-4-5-20251001"
 
+# Cambiar a False cuando tengas créditos en Anthropic
+MODO_DEMO = os.getenv("MODO_DEMO", "true").lower() == "true"
+
 SYSTEM_PROMPT = """
 Eres un asistente experto en facturación electrónica 
 colombiana para el sistema SaaS Facturas Cali.
@@ -128,6 +131,31 @@ def extraer_datos_factura(texto: str = None, imagen_base64: str = None, media_ty
     Returns:
         Diccionario con datos de la factura
     """
+    # Modo demo: devuelve datos simulados sin llamar a la API
+    if MODO_DEMO:
+        print("⚠️  MODO DEMO activo — datos simulados (sin API)")
+        from datetime import date
+        import random
+        proveedores_demo = [
+            {"proveedor": "Ferretería El Tornillo Feliz", "nit": "900123456-1"},
+            {"proveedor": "Distribuidora La 14 S.A.S",    "nit": "800987654-2"},
+            {"proveedor": "Papelería Norma Cali",         "nit": "901234567-3"},
+        ]
+        demo = random.choice(proveedores_demo)
+        total_demo = random.choice([85000, 120000, 250000, 430000, 980000])
+        return {
+            "nit":            demo["nit"],
+            "proveedor":      demo["proveedor"],
+            "fecha":          date.today().isoformat(),
+            "total":          total_demo,
+            "numero_factura": f"FE-{random.randint(1000,9999)}",
+            "items": [
+                {"descripcion": "Producto demo 1", "valor": total_demo // 2},
+                {"descripcion": "Producto demo 2", "valor": total_demo // 2},
+            ],
+            "demo": True  # marca para saber que es simulado
+        }
+
     if texto:
         # PDF: mandar como texto plano
         contenido_usuario = [
