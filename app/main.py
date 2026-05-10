@@ -5,6 +5,7 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 import uvicorn
 import os
 import tempfile
@@ -15,6 +16,10 @@ from dotenv import load_dotenv
 from app.services.database import conectar_mongodb, coleccion_facturas, coleccion_clientes
 from app.services.procesador import procesar_archivo, validar_nit
 from app.services.claude_client import extraer_datos_factura
+
+#importar servicios de Fastapi
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 # Cargar variables de entorno
 load_dotenv()
@@ -65,6 +70,11 @@ async def inicio():
 async def health_check():
     """Verificar que el servidor está funcionando"""
     return {"status": "ok", "timestamp": datetime.now().isoformat()}
+
+# Servir el frontend
+@app.get("/app")
+async def frontend():
+    return FileResponse("index.html")
 
 @app.post("/facturas/subir")
 async def subir_factura(
