@@ -3,316 +3,319 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SaaS Facturas Cali</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<title>Facturex — Automatización de facturas para PyMEs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --verde: #00e676;
-    --verde-oscuro: #00c853;
-    --fondo: #0a0f0a;
-    --superficie: #111811;
-    --borde: #1e2e1e;
-    --texto: #e8f5e9;
-    --texto-dim: #66bb6a;
-    --rojo: #ff5252;
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --bg: #f5f5f7;
+    --bg2: #ffffff;
+    --bg3: #ebebed;
+    --border: #d1d1d6;
+    --border2: #e5e5ea;
+    --text: #1d1d1f;
+    --text2: #3d3d3f;
+    --muted: #86868b;
+    --accent: #0071e3;
+    --accent-h: #0077ed;
+    --accent-light: rgba(0,113,227,0.08);
+    --danger: #d70015;
+    --success: #1c7c54;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
 
   body {
-    background: var(--fondo);
-    color: var(--texto);
-    font-family: var(--mono);
-    min-height: 100vh;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--borde) 1px, transparent 1px),
-      linear-gradient(90deg, var(--borde) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── PANTALLA LOGIN ── */
-  #pantalla-auth {
-    position: fixed;
-    inset: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--fondo);
-  }
-
-  .auth-caja {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 400px;
-    padding: 24px;
-  }
-
-  .auth-logo {
     font-family: var(--sans);
-    font-weight: 800;
-    font-size: 26px;
-    letter-spacing: -1px;
-    color: var(--verde);
-    margin-bottom: 8px;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .auth-sub {
-    font-size: 11px;
-    color: var(--texto-dim);
+  /* ── AUTH ── */
+  #pantalla-auth {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+  }
+
+  .auth-wrap {
+    width: 100%; max-width: 380px; padding: 20px;
+  }
+
+  .auth-brand {
+    text-align: center;
     margin-bottom: 32px;
-    letter-spacing: 1px;
+  }
+
+  .auth-brand .logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .auth-brand .logo-text span { color: var(--accent); }
+
+  .auth-brand p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .auth-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
   }
 
   .auth-tabs {
     display: flex;
-    gap: 1px;
-    background: var(--borde);
-    border-radius: 4px 4px 0 0;
-    overflow: hidden;
-    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
   }
 
   .auth-tab {
     flex: 1;
-    padding: 10px;
-    text-align: center;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
-    background: var(--superficie);
-    color: var(--texto-dim);
+    padding: 12px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    background: none;
     border: none;
+    cursor: pointer;
     transition: all 0.15s;
+    letter-spacing: 0;
   }
 
   .auth-tab.activo {
-    background: var(--verde);
-    color: #000;
-    font-weight: 600;
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+    margin-bottom: -1px;
   }
 
   .auth-form {
-    background: var(--superficie);
-    border: 1px solid var(--borde);
-    border-top: none;
-    border-radius: 0 0 4px 4px;
     padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
   }
 
   .auth-form input {
-    background: var(--fondo);
-    border: 1px solid var(--borde);
-    color: var(--texto);
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 11px 14px;
-    border-radius: 3px;
-    outline: none;
-    transition: border-color 0.2s;
     width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
 
-  .auth-form input::placeholder { color: #2d4a2d; }
-  .auth-form input:focus { border-color: var(--verde); }
+  .auth-form input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.12);
+  }
+
+  .auth-form input::placeholder { color: var(--muted); }
 
   .btn-auth {
-    background: var(--verde);
-    color: #000;
+    width: 100%;
+    padding: 11px;
+    background: var(--accent);
+    color: #fff;
     border: none;
-    font-family: var(--mono);
-    font-size: 12px;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 14px;
     font-weight: 600;
-    letter-spacing: 1px;
-    padding: 12px;
-    border-radius: 3px;
     cursor: pointer;
-    text-transform: uppercase;
     transition: background 0.15s;
   }
 
-  .btn-auth:hover { background: var(--verde-oscuro); }
-  .btn-auth:disabled { background: var(--borde); color: #2d4a2d; cursor: not-allowed; }
+  .btn-auth:hover { background: var(--accent-h); }
+  .btn-auth:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
 
   .auth-error {
     display: none;
     font-size: 12px;
-    color: var(--rojo);
-    padding: 10px 12px;
-    background: rgba(255,82,82,0.08);
-    border: 1px solid rgba(255,82,82,0.2);
-    border-radius: 3px;
-    line-height: 1.6;
+    color: var(--danger);
+    padding: 9px 12px;
+    background: rgba(215,0,21,0.06);
+    border: 1px solid rgba(215,0,21,0.15);
+    border-radius: 8px;
+    line-height: 1.5;
   }
 
   .auth-error.visible { display: block; }
 
-  /* ── APP PRINCIPAL ── */
-  #pantalla-app {
-    display: none;
-    position: relative;
-    z-index: 1;
-  }
+  /* ── APP ── */
+  #pantalla-app { display: none; }
 
-  .contenedor {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 48px 24px;
-  }
-
-  header {
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(245,245,247,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 52px;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 16px;
-    margin-bottom: 56px;
-    border-bottom: 1px solid var(--borde);
-    padding-bottom: 24px;
   }
 
-  .logo {
-    font-family: var(--sans);
-    font-weight: 800;
-    font-size: 26px;
-    letter-spacing: -1px;
-    color: var(--verde);
+  .logo-text {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
   }
 
-  .version {
-    font-size: 11px;
-    color: var(--texto-dim);
-    background: var(--borde);
-    padding: 2px 8px;
-    border-radius: 2px;
-  }
+  .logo-text span { color: var(--accent); }
 
-  .info-usuario {
-    margin-left: auto;
+  .topbar-spacer { flex: 1; }
+
+  .topbar-user {
+    font-size: 13px;
+    color: var(--muted);
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 11px;
-    color: var(--texto-dim);
+  }
+
+  .topbar-empresa {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    background: var(--bg3);
+    padding: 4px 10px;
+    border-radius: 6px;
   }
 
   .btn-salir {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--muted);
     background: none;
-    border: 1px solid var(--borde);
-    color: var(--texto-dim);
-    font-family: var(--mono);
-    font-size: 10px;
+    border: 1px solid var(--border);
     padding: 5px 12px;
-    border-radius: 3px;
+    border-radius: 6px;
     cursor: pointer;
-    letter-spacing: 1px;
     transition: all 0.15s;
   }
 
-  .btn-salir:hover { border-color: var(--rojo); color: var(--rojo); }
+  .btn-salir:hover { border-color: var(--danger); color: var(--danger); }
 
-  .seccion { margin-bottom: 48px; }
+  .contenedor {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
+  }
 
-  .etiqueta {
-    font-size: 10px;
-    letter-spacing: 3px;
+  .seccion { margin-bottom: 40px; }
+
+  .seccion-titulo {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--texto-dim);
-    margin-bottom: 16px;
+    color: var(--muted);
+    margin-bottom: 14px;
   }
 
   /* Zona carga */
   .zona-carga {
-    border: 1px dashed var(--borde);
-    border-radius: 4px;
-    padding: 48px 32px;
+    background: var(--bg2);
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 24px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s;
-    background: var(--superficie);
     position: relative;
+    transition: border-color 0.2s, background 0.2s;
   }
 
   .zona-carga input[type="file"] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
+    position: absolute; inset: 0; opacity: 0;
+    cursor: pointer; width: 100%; height: 100%;
   }
 
   .zona-carga:hover, .zona-carga.arrastrar {
-    border-color: var(--verde);
-    background: rgba(0,230,118,0.04);
+    border-color: var(--accent);
+    background: var(--accent-light);
   }
 
-  .icono-carga { font-size: 32px; margin-bottom: 12px; display: block; }
-
-  .texto-carga {
-    font-size: 13px;
-    color: var(--texto-dim);
-    line-height: 1.8;
+  .zona-icono {
+    width: 44px; height: 44px;
+    background: var(--bg3);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 20px;
   }
 
-  .texto-carga strong { color: var(--verde); }
-
-  .fila-accion {
-    margin-top: 16px;
-    display: flex;
-    gap: 12px;
+  .zona-carga p {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.6;
   }
 
-  .btn-procesar {
-    background: var(--verde);
-    color: #000;
-    border: none;
-    font-family: var(--mono);
+  .zona-carga p strong { color: var(--accent); font-weight: 600; }
+
+  .zona-carga small {
     font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    padding: 10px 24px;
-    border-radius: 3px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: background 0.15s;
-    white-space: nowrap;
+    color: var(--muted);
+    font-family: var(--mono);
   }
 
-  .btn-procesar:hover    { background: var(--verde-oscuro); }
-  .btn-procesar:disabled { background: var(--borde); color: #2d4a2d; cursor: not-allowed; }
-
-  .archivo-chip {
+  .chip-archivo {
     display: none;
     align-items: center;
     gap: 10px;
     margin-top: 12px;
-    padding: 8px 12px;
-    background: rgba(0,230,118,0.06);
-    border: 1px solid rgba(0,230,118,0.2);
-    border-radius: 3px;
-    font-size: 12px;
-    color: var(--verde);
+    padding: 9px 14px;
+    background: var(--accent-light);
+    border: 1px solid rgba(0,113,227,0.2);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--accent);
   }
-  .archivo-chip.visible { display: flex; }
 
-  .barra { display: none; height: 2px; background: var(--borde); border-radius: 1px; margin-top: 16px; overflow: hidden; }
+  .chip-archivo.visible { display: flex; }
+
+  .fila-accion { margin-top: 14px; }
+
+  .btn-procesar {
+    padding: 10px 24px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-procesar:hover { background: var(--accent-h); }
+  .btn-procesar:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  .barra { display: none; height: 3px; background: var(--border); border-radius: 2px; margin-top: 14px; overflow: hidden; }
   .barra.visible { display: block; }
-  .barra-inner { height: 100%; background: var(--verde); animation: cargando 1.4s ease-in-out infinite; }
+  .barra-inner { height: 100%; background: var(--accent); animation: cargando 1.4s ease-in-out infinite; }
 
   @keyframes cargando {
     0%   { width: 0%;  margin-left: 0%; }
@@ -320,166 +323,274 @@
     100% { width: 0%;  margin-left: 100%; }
   }
 
-  .resultado { display: none; margin-top: 24px; border: 1px solid var(--borde); border-radius: 4px; overflow: hidden; }
+  .error-msg {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(215,0,21,0.06);
+    border: 1px solid rgba(215,0,21,0.15);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--danger);
+    line-height: 1.6;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* Resultado */
+  .resultado { display: none; margin-top: 20px; }
   .resultado.visible { display: block; }
+
+  .resultado-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
 
   .resultado-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: var(--superficie);
-    border-bottom: 1px solid var(--borde);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--texto-dim);
+    border-bottom: 1px solid var(--border2);
+    background: var(--bg);
   }
 
-  .badge { padding: 3px 10px; border-radius: 2px; font-size: 10px; letter-spacing: 1px; }
-  .badge.ok  { background: rgba(0,230,118,0.15); color: var(--verde); }
+  .resultado-header span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
 
-  .resultado-body { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .badge-ok {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--success);
+    background: rgba(28,124,84,0.1);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .resultado-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
 
   .dato { display: flex; flex-direction: column; gap: 4px; }
-  .dato label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #2d6a2d; }
-  .dato .val { font-size: 14px; color: var(--texto); font-weight: 600; }
-  .dato .val.total { font-family: var(--sans); font-size: 22px; font-weight: 700; color: var(--verde); }
-  .dato .val.ok  { color: var(--verde); }
-  .dato .val.mal { color: var(--rojo); }
+  .dato label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .dato .val {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .dato .val.total {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .dato .val.ok  { color: var(--success); }
+  .dato .val.mal { color: var(--danger); }
+  .dato .val.id  {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
   .dato.full { grid-column: 1 / -1; }
 
-  .error-msg { display: none; margin-top: 16px; padding: 12px 16px; background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.25); border-radius: 3px; font-size: 12px; color: var(--rojo); line-height: 1.6; }
-  .error-msg.visible { display: block; }
-
   /* Lista facturas */
-  .cabecera-lista { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .cabecera-lista {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
 
-  .btn-recargar { background: none; border: 1px solid var(--borde); color: var(--texto-dim); font-family: var(--mono); font-size: 11px; padding: 6px 14px; border-radius: 3px; cursor: pointer; transition: all 0.15s; }
-  .btn-recargar:hover { border-color: var(--verde); color: var(--verde); }
+  .btn-recargar {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
 
-  .lista { display: flex; flex-direction: column; gap: 1px; background: var(--borde); border: 1px solid var(--borde); border-radius: 4px; overflow: hidden; }
+  .btn-recargar:hover { border-color: var(--accent); color: var(--accent); }
 
-  .fila { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr; gap: 16px; align-items: center; padding: 14px 16px; background: var(--superficie); font-size: 12px; transition: background 0.1s; }
-  .fila:hover { background: rgba(0,230,118,0.03); }
-  .fila.cabecera { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #2d6a2d; background: var(--fondo); pointer-events: none; }
+  .tabla {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
 
-  .fila .proveedor { font-weight: 600; }
-  .fila .nit       { color: var(--texto-dim); font-size: 11px; }
-  .fila .monto     { color: var(--verde); font-weight: 600; text-align: right; }
-  .fila .fecha     { color: #2d6a2d; font-size: 11px; }
+  .fila {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr;
+    gap: 16px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border2);
+    align-items: center;
+    transition: background 0.1s;
+  }
 
-  .vacio { padding: 40px; text-align: center; font-size: 12px; color: #2d4a2d; }
+  .fila:last-child { border-bottom: none; }
+  .fila:hover:not(.cabecera) { background: var(--bg); }
 
-  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--borde); font-size: 10px; color: #2d4a2d; display: flex; justify-content: space-between; }
+  .fila.cabecera {
+    background: var(--bg);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .fila .proveedor { font-weight: 500; color: var(--text); font-size: 13px; }
+  .fila .nit { font-family: var(--mono); color: var(--muted); font-size: 11px; }
+  .fila .fecha { color: var(--muted); font-size: 12px; }
+  .fila .monto { font-weight: 600; color: var(--accent); text-align: right; font-size: 13px; }
+
+  .tabla-vacio {
+    padding: 48px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    max-width: 760px;
+    margin: 0 auto;
+  }
 
   @media (max-width: 600px) {
     .resultado-body { grid-template-columns: 1fr; }
     .fila { grid-template-columns: 1fr 1fr; }
     .fila .fecha, .fila .nit { display: none; }
-    .info-usuario span { display: none; }
+    .topbar-empresa { display: none; }
   }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     PANTALLA DE AUTENTICACIÓN
-════════════════════════════════════════════ -->
+<!-- AUTH -->
 <div id="pantalla-auth">
-  <div class="auth-caja">
-    <div class="auth-logo">Facturas Cali</div>
-    <div class="auth-sub">Sistema de gestión de facturas para PyMEs</div>
-
-    <div class="auth-tabs">
-      <button class="auth-tab activo" id="tab-login" onclick="mostrarTab('login')">Ingresar</button>
-      <button class="auth-tab" id="tab-registro" onclick="mostrarTab('registro')">Registrarse</button>
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="logo-text">Factur<span>ex</span></div>
+      <p>Gestión inteligente de facturas para PyMEs</p>
     </div>
-
-    <!-- Formulario login -->
-    <div class="auth-form" id="form-login">
-      <input type="text" id="login-usuario" placeholder="Nombre de usuario" autocomplete="username">
-      <input type="password" id="login-contrasena" placeholder="Contraseña" autocomplete="current-password">
-      <div class="auth-error" id="login-error"></div>
-      <button class="btn-auth" id="btn-login" onclick="hacerLogin()">Ingresar</button>
-    </div>
-
-    <!-- Formulario registro -->
-    <div class="auth-form" id="form-registro" style="display:none">
-      <input type="text" id="reg-negocio" placeholder="Nombre del negocio (ej: Ferretería El Perno)">
-      <input type="text" id="reg-usuario" placeholder="Nombre de usuario (sin espacios)">
-      <input type="password" id="reg-contrasena" placeholder="Contraseña">
-      <div class="auth-error" id="reg-error"></div>
-      <button class="btn-auth" id="btn-registro" onclick="hacerRegistro()">Crear cuenta</button>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab activo" id="tab-login" onclick="mostrarTab('login')">Ingresar</button>
+        <button class="auth-tab" id="tab-registro" onclick="mostrarTab('registro')">Registrarse</button>
+      </div>
+      <div class="auth-form" id="form-login">
+        <input type="text" id="login-usuario" placeholder="Usuario" autocomplete="username">
+        <input type="password" id="login-contrasena" placeholder="Contraseña" autocomplete="current-password">
+        <div class="auth-error" id="login-error"></div>
+        <button class="btn-auth" id="btn-login" onclick="hacerLogin()">Ingresar</button>
+      </div>
+      <div class="auth-form" id="form-registro" style="display:none">
+        <input type="text" id="reg-negocio" placeholder="Nombre del negocio">
+        <input type="text" id="reg-usuario" placeholder="Usuario (sin espacios)">
+        <input type="password" id="reg-contrasena" placeholder="Contraseña">
+        <div class="auth-error" id="reg-error"></div>
+        <button class="btn-auth" id="btn-registro" onclick="hacerRegistro()">Crear cuenta</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     PANTALLA PRINCIPAL (APP)
-════════════════════════════════════════════ -->
+<!-- APP -->
 <div id="pantalla-app">
-<div class="contenedor">
 
-  <header>
-    <div class="logo">Facturas Cali</div>
-    <span class="version">v1.0.0</span>
-    <div class="info-usuario">
-      <span id="txt-negocio"></span>
+  <div class="topbar">
+    <div class="logo-text">Factur<span>ex</span></div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-user">
+      <span class="topbar-empresa" id="txt-negocio"></span>
       <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-    </div>
-  </header>
-
-  <!-- SUBIR FACTURA -->
-  <div class="seccion">
-    <div class="etiqueta">// Subir factura</div>
-
-    <div class="zona-carga" id="zona">
-      <input type="file" id="input-archivo" accept=".pdf,.jpg,.jpeg,.png,.webp">
-      <span class="icono-carga">📄</span>
-      <div class="texto-carga">
-        <strong>Arrastra tu factura aquí</strong><br>
-        o haz clic para seleccionar<br>
-        PDF · JPG · PNG · WebP
-      </div>
-    </div>
-
-    <div class="archivo-chip" id="chip-archivo">
-      <span>📎</span>
-      <span id="txt-archivo"></span>
-    </div>
-
-    <div class="fila-accion">
-      <button class="btn-procesar" id="btn-procesar" disabled onclick="procesarFactura()">Procesar</button>
-    </div>
-
-    <div class="barra" id="barra"><div class="barra-inner"></div></div>
-    <div class="error-msg" id="error-msg"></div>
-
-    <div class="resultado" id="resultado">
-      <div class="resultado-header">
-        <span>Datos extraídos</span>
-        <span class="badge ok">PROCESADO</span>
-      </div>
-      <div class="resultado-body" id="resultado-body"></div>
     </div>
   </div>
 
-  <!-- LISTA FACTURAS -->
-  <div class="seccion">
-    <div class="cabecera-lista">
-      <div class="etiqueta">// Mis facturas</div>
-      <button class="btn-recargar" onclick="cargarFacturas()">↻ Recargar</button>
+  <div class="contenedor">
+
+    <div class="seccion">
+      <div class="seccion-titulo">Subir factura</div>
+
+      <div class="zona-carga" id="zona">
+        <input type="file" id="input-archivo" accept=".pdf,.jpg,.jpeg,.png,.webp">
+        <div class="zona-icono">📄</div>
+        <p><strong>Arrastra tu factura aquí</strong><br>o haz clic para seleccionar</p>
+        <small>PDF · JPG · PNG · WebP</small>
+      </div>
+
+      <div class="chip-archivo" id="chip-archivo">
+        <span>📎</span>
+        <span id="txt-archivo"></span>
+      </div>
+
+      <div class="fila-accion">
+        <button class="btn-procesar" id="btn-procesar" disabled onclick="procesarFactura()">Procesar factura</button>
+      </div>
+
+      <div class="barra" id="barra"><div class="barra-inner"></div></div>
+      <div class="error-msg" id="error-msg"></div>
+
+      <div class="resultado" id="resultado">
+        <div class="resultado-card">
+          <div class="resultado-header">
+            <span>Datos extraídos</span>
+            <span class="badge-ok">✓ Procesado</span>
+          </div>
+          <div class="resultado-body" id="resultado-body"></div>
+        </div>
+      </div>
     </div>
-    <div id="contenedor-lista"><div class="vacio">Cargando...</div></div>
+
+    <div class="seccion">
+      <div class="cabecera-lista">
+        <div class="seccion-titulo" style="margin:0">Mis facturas</div>
+        <button class="btn-recargar" onclick="cargarFacturas()">↻ Actualizar</button>
+      </div>
+      <div id="contenedor-lista"><div class="tabla-vacio">Cargando...</div></div>
+    </div>
+
   </div>
 
   <footer>
-    <span>SaaS Facturas Cali — PyMEs Colombia</span>
+    <span>Facturex — PyMEs Colombia</span>
     <span id="txt-hora"></span>
   </footer>
 
-</div>
 </div>
 
 <script>
@@ -487,7 +598,6 @@ const API = 'https://saas-facturas-cali-production.up.railway.app';
 let archivoActual = null;
 let tokenSesion   = null;
 
-// ─── Auth: tabs ──────────────────────────────
 function mostrarTab(tab) {
   document.getElementById('form-login').style.display    = tab === 'login'    ? 'flex' : 'none';
   document.getElementById('form-registro').style.display = tab === 'registro' ? 'flex' : 'none';
@@ -495,137 +605,71 @@ function mostrarTab(tab) {
   document.getElementById('tab-registro').className = 'auth-tab' + (tab === 'registro' ? ' activo' : '');
 }
 
-// ─── Login ───────────────────────────────────
 async function hacerLogin() {
   const usuario    = document.getElementById('login-usuario').value.trim();
   const contrasena = document.getElementById('login-contrasena').value;
   const errorEl    = document.getElementById('login-error');
   const btn        = document.getElementById('btn-login');
-
-  if (!usuario || !contrasena) {
-    errorEl.textContent = 'Completa todos los campos.';
-    errorEl.classList.add('visible');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Ingresando...';
-  errorEl.classList.remove('visible');
-
+  if (!usuario || !contrasena) { errorEl.textContent = 'Completa todos los campos.'; errorEl.classList.add('visible'); return; }
+  btn.disabled = true; btn.textContent = 'Ingresando...'; errorEl.classList.remove('visible');
   try {
-    const res  = await fetch(`${API}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuario, contrasena })
-    });
+    const res  = await fetch(`${API}/login`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({usuario, contrasena}) });
     const data = await res.json();
-
     if (!res.ok) throw new Error(data.detail || 'Error al ingresar');
-
     tokenSesion = data.token;
-    localStorage.setItem('fc_token',   data.token);
+    localStorage.setItem('fc_token', data.token);
     localStorage.setItem('fc_negocio', data.nombre_negocio);
     entrarApp(data.nombre_negocio);
-
-  } catch (err) {
-    errorEl.textContent = err.message;
-    errorEl.classList.add('visible');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Ingresar';
-  }
+  } catch (err) { errorEl.textContent = err.message; errorEl.classList.add('visible'); }
+  finally { btn.disabled = false; btn.textContent = 'Ingresar'; }
 }
 
-// ─── Registro ────────────────────────────────
 async function hacerRegistro() {
   const nombre_negocio = document.getElementById('reg-negocio').value.trim();
   const usuario        = document.getElementById('reg-usuario').value.trim();
   const contrasena     = document.getElementById('reg-contrasena').value;
   const errorEl        = document.getElementById('reg-error');
   const btn            = document.getElementById('btn-registro');
-
-  if (!nombre_negocio || !usuario || !contrasena) {
-    errorEl.textContent = 'Completa todos los campos.';
-    errorEl.classList.add('visible');
-    return;
-  }
-
-  if (usuario.includes(' ')) {
-    errorEl.textContent = 'El usuario no puede tener espacios.';
-    errorEl.classList.add('visible');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Creando cuenta...';
-  errorEl.classList.remove('visible');
-
+  if (!nombre_negocio || !usuario || !contrasena) { errorEl.textContent = 'Completa todos los campos.'; errorEl.classList.add('visible'); return; }
+  if (usuario.includes(' ')) { errorEl.textContent = 'El usuario no puede tener espacios.'; errorEl.classList.add('visible'); return; }
+  btn.disabled = true; btn.textContent = 'Creando cuenta...'; errorEl.classList.remove('visible');
   try {
-    const res  = await fetch(`${API}/registro`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuario, contrasena, nombre_negocio })
-    });
+    const res  = await fetch(`${API}/registro`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({usuario, contrasena, nombre_negocio}) });
     const data = await res.json();
-
     if (!res.ok) throw new Error(data.detail || 'Error al registrar');
-
-    // Auto-login después del registro
     document.getElementById('login-usuario').value    = usuario;
     document.getElementById('login-contrasena').value = contrasena;
     mostrarTab('login');
     await hacerLogin();
-
-  } catch (err) {
-    errorEl.textContent = err.message;
-    errorEl.classList.add('visible');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Crear cuenta';
-  }
+  } catch (err) { errorEl.textContent = err.message; errorEl.classList.add('visible'); }
+  finally { btn.disabled = false; btn.textContent = 'Crear cuenta'; }
 }
 
-// ─── Entrar a la app ─────────────────────────
 function entrarApp(nombreNegocio) {
   document.getElementById('pantalla-auth').style.display = 'none';
   document.getElementById('pantalla-app').style.display  = 'block';
   document.getElementById('txt-negocio').textContent     = nombreNegocio;
   document.getElementById('txt-hora').textContent =
-    new Date().toLocaleString('es-CO', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
+    new Date().toLocaleString('es-CO', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short'});
   cargarFacturas();
 }
 
-// ─── Cerrar sesión ───────────────────────────
 async function cerrarSesion() {
-  if (tokenSesion) {
-    await fetch(`${API}/logout`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${tokenSesion}` }
-    }).catch(() => {});
-  }
+  if (tokenSesion) await fetch(`${API}/logout`, {method:'POST', headers:{'Authorization':`Bearer ${tokenSesion}`}}).catch(()=>{});
   tokenSesion = null;
-  localStorage.removeItem('fc_token');
-  localStorage.removeItem('fc_negocio');
+  localStorage.removeItem('fc_token'); localStorage.removeItem('fc_negocio');
   document.getElementById('pantalla-auth').style.display = 'flex';
   document.getElementById('pantalla-app').style.display  = 'none';
-  document.getElementById('login-usuario').value    = '';
+  document.getElementById('login-usuario').value = '';
   document.getElementById('login-contrasena').value = '';
 }
 
-// ─── Zona de carga ───────────────────────────
 const zona = document.getElementById('zona');
 const inputArchivo = document.getElementById('input-archivo');
-
 zona.addEventListener('dragover',  e => { e.preventDefault(); zona.classList.add('arrastrar'); });
 zona.addEventListener('dragleave', () => zona.classList.remove('arrastrar'));
-zona.addEventListener('drop', e => {
-  e.preventDefault();
-  zona.classList.remove('arrastrar');
-  if (e.dataTransfer.files[0]) seleccionar(e.dataTransfer.files[0]);
-});
-inputArchivo.addEventListener('change', e => {
-  if (e.target.files[0]) seleccionar(e.target.files[0]);
-});
+zona.addEventListener('drop', e => { e.preventDefault(); zona.classList.remove('arrastrar'); if (e.dataTransfer.files[0]) seleccionar(e.dataTransfer.files[0]); });
+inputArchivo.addEventListener('change', e => { if (e.target.files[0]) seleccionar(e.target.files[0]); });
 
 function seleccionar(archivo) {
   archivoActual = archivo;
@@ -636,125 +680,60 @@ function seleccionar(archivo) {
   document.getElementById('resultado').classList.remove('visible');
 }
 
-// ─── Procesar factura ────────────────────────
 async function procesarFactura() {
   if (!archivoActual || !tokenSesion) return;
   const btn = document.getElementById('btn-procesar');
-
-  btn.disabled = true;
-  btn.textContent = 'Procesando...';
+  btn.disabled = true; btn.textContent = 'Procesando...';
   document.getElementById('barra').classList.add('visible');
   document.getElementById('error-msg').classList.remove('visible');
   document.getElementById('resultado').classList.remove('visible');
-
   const form = new FormData();
   form.append('archivo', archivoActual);
-
   try {
-    const res  = await fetch(`${API}/facturas/subir`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${tokenSesion}` },
-      body: form
-    });
+    const res  = await fetch(`${API}/facturas/subir`, {method:'POST', headers:{'Authorization':`Bearer ${tokenSesion}`}, body: form});
     const data = await res.json();
-
     if (!res.ok) throw new Error(data.detail || 'Error procesando la factura');
-
     const d     = data.datos;
     const total = d.total ? `$${Number(d.total).toLocaleString('es-CO')}` : '—';
     const nitCl = d.nit_valido ? 'ok' : 'mal';
-    const nitIc = d.nit_valido ? '✅' : '⚠️';
-
+    const nitIc = d.nit_valido ? '✓' : '⚠';
     document.getElementById('resultado-body').innerHTML = `
-      <div class="dato">
-        <label>Proveedor</label>
-        <div class="val">${d.proveedor || '—'}</div>
-      </div>
-      <div class="dato">
-        <label>NIT</label>
-        <div class="val ${nitCl}">${nitIc} ${d.nit || '—'}</div>
-      </div>
-      <div class="dato">
-        <label>Total COP</label>
-        <div class="val total">${total}</div>
-      </div>
-      <div class="dato">
-        <label>Fecha</label>
-        <div class="val">${d.fecha || '—'}</div>
-      </div>
-      <div class="dato full">
-        <label>ID guardado</label>
-        <div class="val" style="font-size:11px;color:var(--texto-dim)">${data.id}</div>
-      </div>
-    `;
+      <div class="dato"><label>Proveedor</label><div class="val">${d.proveedor || '—'}</div></div>
+      <div class="dato"><label>NIT</label><div class="val ${nitCl}">${nitIc} ${d.nit || '—'}</div></div>
+      <div class="dato"><label>Total COP</label><div class="val total">${total}</div></div>
+      <div class="dato"><label>Fecha</label><div class="val">${d.fecha || '—'}</div></div>
+      <div class="dato full"><label>ID</label><div class="val id">${data.id}</div></div>`;
     document.getElementById('resultado').classList.add('visible');
     cargarFacturas();
-
   } catch (err) {
     const el = document.getElementById('error-msg');
-    el.textContent = `❌ ${err.message}`;
-    el.classList.add('visible');
+    el.textContent = err.message; el.classList.add('visible');
   } finally {
     document.getElementById('barra').classList.remove('visible');
-    btn.disabled = false;
-    btn.textContent = 'Procesar';
+    btn.disabled = false; btn.textContent = 'Procesar factura';
   }
 }
 
-// ─── Listar facturas ─────────────────────────
 async function cargarFacturas() {
   const c = document.getElementById('contenedor-lista');
   if (!tokenSesion) return;
-
   try {
-    const res  = await fetch(`${API}/facturas?limite=20`, {
-      headers: { 'Authorization': `Bearer ${tokenSesion}` }
-    });
+    const res  = await fetch(`${API}/facturas?limite=20`, {headers:{'Authorization':`Bearer ${tokenSesion}`}});
     const data = await res.json();
-
-    if (!data.facturas?.length) {
-      c.innerHTML = '<div class="vacio">Aún no hay facturas procesadas</div>';
-      return;
-    }
-
+    if (!data.facturas?.length) { c.innerHTML = '<div class="tabla-vacio">Aún no hay facturas procesadas</div>'; return; }
     const filas = data.facturas.map(f => {
       const total = f.total ? `$${Number(f.total).toLocaleString('es-CO')}` : '—';
-      const fecha = f.fecha_procesado
-        ? new Date(f.fecha_procesado).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })
-        : '—';
-      return `
-        <div class="fila">
-          <div class="proveedor">${f.proveedor || f.archivo_original || '—'}</div>
-          <div class="nit">${f.nit || '—'}</div>
-          <div class="fecha">${fecha}</div>
-          <div class="monto">${total}</div>
-        </div>`;
+      const fecha = f.fecha_procesado ? new Date(f.fecha_procesado).toLocaleDateString('es-CO', {day:'2-digit', month:'short'}) : '—';
+      return `<div class="fila"><div class="proveedor">${f.proveedor || f.archivo_original || '—'}</div><div class="nit">${f.nit || '—'}</div><div class="fecha">${fecha}</div><div class="monto">${total}</div></div>`;
     }).join('');
-
-    c.innerHTML = `
-      <div class="lista">
-        <div class="fila cabecera">
-          <div>Proveedor</div><div>NIT</div><div>Fecha</div>
-          <div style="text-align:right">Total</div>
-        </div>
-        ${filas}
-      </div>`;
-
-  } catch {
-    c.innerHTML = '<div class="vacio">Error cargando facturas</div>';
-  }
+    c.innerHTML = `<div class="tabla"><div class="fila cabecera"><div>Proveedor</div><div>NIT</div><div>Fecha</div><div style="text-align:right">Total</div></div>${filas}</div>`;
+  } catch { c.innerHTML = '<div class="tabla-vacio">Error cargando facturas</div>'; }
 }
 
-// ─── Init: revisar sesión guardada ───────────
 const tokenGuardado  = localStorage.getItem('fc_token');
 const negocioGuardado = localStorage.getItem('fc_negocio');
+if (tokenGuardado && negocioGuardado) { tokenSesion = tokenGuardado; entrarApp(negocioGuardado); }
 
-if (tokenGuardado && negocioGuardado) {
-  tokenSesion = tokenGuardado;
-  entrarApp(negocioGuardado);
-}
-
-// Enter en login
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     if (document.getElementById('form-login').style.display !== 'none') hacerLogin();
